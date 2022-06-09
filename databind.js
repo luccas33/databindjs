@@ -20,7 +20,6 @@ function cadastroProdutoComponent(produto) {
     function lerPreco() {
         produto.preco = Number.parseFloat(document.getElementById('it' + idPreco).value);
         if (!produto.preco) produto.preco = 0;
-        document.getElementById('lb' + idPreco).innerText = produto.preco;
     };
     addBind(idPreco, lerPreco);
 
@@ -29,7 +28,6 @@ function cadastroProdutoComponent(produto) {
     function lerEstoque() {
         produto.estoque = Number.parseFloat(document.getElementById('it' + idEstoque).value);
         if (!produto.estoque) produto.estoque = 0;
-        document.getElementById('lb' + idEstoque).innerText = produto.estoque;
     };
     addBind(idEstoque, lerEstoque);
 
@@ -49,6 +47,16 @@ function cadastroProdutoComponent(produto) {
 }
 
 function descricaoProdutoComponent(produto) {
+    function atualizarPreco() {
+        document.getElementById('lb' + produto.idPreco).innerText = produto.preco;
+    };
+    addBind(produto.idPreco, atualizarPreco);
+
+    function atualizarEstoque() {
+        document.getElementById('lb' + produto.idEstoque).innerText = produto.estoque;
+    };
+    addBind(produto.idEstoque, atualizarEstoque);
+
     return `
         <div class="produto">
             <p>${produto.nome}</p>
@@ -76,9 +84,15 @@ function getBindId() {
 }
 
 function addBind(id, func) {
-    if (id && func) {
-        binds.push({id: id, exec: func});
+    if (!id || !func) {
+        return;
     }
+    let bindsOfId = binds.find(b => b.id === id);
+    if (!bindsOfId) {
+        bindsOfId = {id: id, functions: []};
+        binds.push(bindsOfId);
+    }
+    bindsOfId.functions.push(func);
 }
 
 function bind(id) {
@@ -87,6 +101,6 @@ function bind(id) {
     }
     let bind = binds.find(b => b.id === id);
     if (bind) {
-        bind.exec();
+        bind.functions.forEach(func => func());
     }
 }
